@@ -1,0 +1,21 @@
+#α diversity
+setwd()
+library(picante)
+library(ggplot2)
+alpha <- function(x, base = exp(1)) {
+  est <- estimateR(x)
+  Richness <- est[1, ]
+  Chao1 <- est[2, ]
+  ACE <- est[4, ]
+  Shannon <- diversity(x, index = 'shannon', base = base)
+  Simpson <- diversity(x, index = 'simpson')
+  Pielou <- Shannon / log(Richness, base)
+  goods_coverage <- 1 - rowSums(x == 1) / rowSums(x)
+  
+  result <- data.frame(Richness, Shannon, Simpson, Pielou, Chao1, ACE, goods_coverage)
+}
+comm.data<-read.table("ASV/OTU/Others.txt",header=T,row.names=1)
+comm.data<-t(comm.data)
+comm.data<-comm.data[,-1]
+alpha_all <- alpha(comm.data, base = 2)
+write.csv(alpha_all, 'alphya.csv', quote = FALSE)
